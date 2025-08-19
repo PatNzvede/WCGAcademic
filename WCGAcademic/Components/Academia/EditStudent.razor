@@ -1,0 +1,87 @@
+﻿@page "/academia/editstudent"
+@page "/academia/editstudent/{id:int}"
+@using WCGAcademic.InMemoryData
+@rendermode InteractiveServer
+@inject IStudentService studentService;
+@inject NavigationManager navigationManager
+
+@if (Id == null)
+{
+    <h3>Create a new Student</h3>
+}
+else
+{
+    <h3> Edit @student.PersonId</h3>
+}
+
+
+<EditForm Model="student" OnSubmit="HandleSubmit" FormName="create">
+    <div>
+        <label for="coursecode">CourseCode</label>
+        <InputText id="coursecode" @bind-Value="student.CourseCode" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for="personid">PersonId</label>
+        <InputNumber id="personid" @bind-Value="student.PersonId" class="form-control"></InputNumber>
+    </div>
+    <div>
+        <label for="status">Status</label>
+        <InputText id="status" @bind-Value="student.Status" class="form-control"></InputText>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">@btnText</button>
+    @if(Id != null)
+    {
+    <button type="button" class="btn btn-danger" @onclick="DeleteStudent"> Delete Student</button>
+    }
+
+
+</EditForm>
+
+
+@code {
+
+    [Parameter]
+    public int? Id { get; set; }
+   
+
+    Student student = new Student();
+    public string btnText = string.Empty;
+
+    public int StudentId = 1;
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id != null)
+        {
+            student = await studentService.GetSingleStudent((int)Id);
+
+        }
+    }
+
+
+    protected override void OnInitialized()
+    {
+
+        btnText = Id == null ? "Save new student" : "Update student";
+    }
+
+
+    async Task HandleSubmit()
+    {
+        if (Id == null)
+        {
+            await studentService.CreateStudent(student);
+            navigationManager.NavigateTo("/academia/students");
+        }
+        else
+        {
+            await studentService.UpdateStudent(student, (int)Id);
+            navigationManager.NavigateTo($"/academia/students/{Id}");
+        }
+    }
+    async Task DeleteStudent()
+    {
+        await studentService.DeleteStudent(student.Id);
+        navigationManager.NavigateTo("/academia/students");
+    }
+    }

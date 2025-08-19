@@ -1,0 +1,63 @@
+﻿@page "/academia/students/{Id:int}"
+@using WCGAcademic.InMemoryData
+@inject NavigationManager navigationManager
+@inject IStudentService studentService
+@rendermode InteractiveServer
+@using System.Linq
+
+<h3>Students</h3>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>CourseCode</th>
+            <th>PersonId</th>
+            <th>Status</th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in studentService.Students)
+        {
+            <tr>
+                <td>@student.CourseCode</td>
+                <td>@student.PersonId</td>
+                <td>@student.Status</td>
+                <td></td>
+                <td>
+                    <button class="btn btn-primary" @onclick="(() => ShowStudent(student.Id))">
+                        Edit
+                        @* <i class="oi oi-pencil"></i> *@
+                    </button>
+                </td>
+                <td></td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+<button class="btn btn-primary" @onclick="CreateNewStudent">Create</button>
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await studentService.GetStudent();
+
+    }
+
+    
+
+    void ShowStudent(int id)
+    {
+        navigationManager.NavigateTo($"/academia/student/{id}");
+    }
+    void CreateNewStudent()
+    {
+        navigationManager.NavigateTo($"/academia/student");
+    }
+
+}

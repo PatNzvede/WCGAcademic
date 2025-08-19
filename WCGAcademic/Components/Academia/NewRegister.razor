@@ -1,0 +1,98 @@
+﻿@page "/academia/newregisters"
+@using WCGAcademic.InMemoryData
+@rendermode InteractiveServer
+@inject ICourseRegisterService courseServiceRegister
+@inject NavigationManager navigationManager
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@inject IPersonService personService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<h3>Course Register</h3>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>StudentName</th>
+            <th>PersonId</th>
+            @*   <th>PersonCode</th> *@
+            <th>CourseCode</th>
+            <th>Status</th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var register in courseServiceRegister.CourseRegisters)
+        {
+            <tr>
+                <td>@register.StudentName</td>
+                <td>@register.PersonId</td>
+                @*  <td>@register.PersonCode</td> *@
+                <td>@register.CourseCode</td>
+                <td>@register.Status</td>
+                <td>
+                    <button class="btn btn-primary" @onclick="(() => ShowCourseRegister(register.Id))">
+                        Edit
+                        @* <i class="oi oi-pencil"></i> *@
+                    </button>
+                </td>
+
+                <td>
+                    <button type="submit" class="btn btn-warning" @onclick="(() => StudentRecords(register.PersonId))">StudentRecords</button>
+                </td>
+                <td>
+                    <button type="submit" class="btn btn-warning" @onclick="(() => CheckRecords(register.CourseCode))">CheckRecords</button>
+                </td>
+                <td></td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+<button class="btn btn-primary" @onclick="CreateNewCourseRegister">Create</button>
+
+
+@code {
+
+    private ClaimsPrincipal? currentUser;
+    protected Person memuser;
+   
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        currentUser = authenticationState.User;
+
+        string? username = currentUser?.Identity?.Name;
+        bool isAuthenticated = currentUser?.Identity?.IsAuthenticated ?? false;
+        var claims = currentUser?.Claims;
+        var userid = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        memuser = await personService.GetGuidPerson(userid);
+
+        await courseServiceRegister.GetRegisterByCodeByUserId(memuser.Id);
+
+    }
+
+    void ShowCourseRegister(int id)
+    {
+        navigationManager.NavigateTo($"/academia/editregister/{id}");
+    }
+    void CreateNewCourseRegister()
+    {
+        navigationManager.NavigateTo($"/academia/editregister");
+    }
+    async Task CheckRecords(string code)
+    {
+        await courseServiceRegister.GetCourseRegisterByCode(code);
+    }
+
+
+    async Task StudentRecords(int code)
+    {
+        await courseServiceRegister.GetStudentRegisterByCode(code);
+    }
+
+
+}

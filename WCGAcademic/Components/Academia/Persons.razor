@@ -1,0 +1,57 @@
+﻿@page "/academia/people"
+@* @rendermode IteractiveServer *@
+@using WCGAcademic.InMemoryData
+@inject NavigationManager navigationManager
+@inject IPersonService personService
+
+<h3> Person</h3>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Role</th>
+            <th>Email</th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var person in personService.People)
+        {
+            <tr>
+                <td>@person.Role</td>
+                <td>@person.Email</td>
+                <td>
+                    <button class="btn btn-primary" @onclick="(() => ShowPerson(person.Id))">
+                        Edit
+                        @* <i class="oi oi-pencil"></i> *@
+                    </button>
+                </td>
+                <td></td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+<button class="btn btn-primary" @onclick="CreateNewPerson">Create</button>
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await personService.GetPeople();
+
+    }
+
+    void ShowPerson(int id)
+    {
+        navigationManager.NavigateTo($"/academia/people/{id}");
+    }
+    void CreateNewPerson()
+    {
+        navigationManager.NavigateTo($"/academia/people");
+    }
+
+}

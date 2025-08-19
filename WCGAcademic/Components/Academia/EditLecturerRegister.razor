@@ -1,0 +1,100 @@
+﻿@page "/academia/editlecturerregister"
+@page "/academia/editlecturerregister/{id:int}"
+@using WCGAcademic.InMemoryData
+@inject NavigationManager navigationManager
+@inject ICourseRegisterService courseServiceRegister;
+@rendermode InteractiveServer
+
+
+@if (Id == null)
+{
+    <h3>Create a new Course Register</h3>
+}
+else
+{
+    <h3> Edit @courseRegister.StudentName</h3>
+}
+
+<EditForm Model="courseRegister" OnSubmit="HandleSubmit" FormName="create">
+    <div>
+        <label for="studentname">StudentName</label>
+        <InputText id="studentname" @bind-Value="courseRegister.StudentName" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for="coursecode">CourseCode</label>
+        <InputText id="coursecode" @bind-Value="courseRegister.CourseCode" class="form-control"></InputText>
+    </div>
+
+
+    <div>
+        <select class="form-control" @bind="courseRegister.Status">
+            <option value="">-- Select Status --</option>
+            <option value="Request Approval">Request Approval</option>
+             <option value="Enrolled/Approved">Enrolled/Approved</option>
+            <option value="Declined">Decline</option>
+        </select>
+
+    </div>
+    <div>
+        <label for="personid">PersonId</label>
+        <InputText id="personid" @bind-Value="courseRegister.PersonCode" class="form-control"></InputText>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">@btnText</button>
+
+    @if (Id != null)
+    {
+        <button type="button" class="btn btn-danger" @onclick="DeleteCourse"> Delete Course</button>
+    }
+
+
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public int? Id { get; set; }
+
+    CourseRegister courseRegister = new CourseRegister();
+    public string btnText = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        @if (Id != null)
+        {
+            courseRegister = await courseServiceRegister.GetSingleCourseRegister((int)Id);
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        btnText = Id == null ? "Save new course register" : "Update Course Register";
+    }
+
+
+
+    async Task HandleSubmit()
+    {
+        @if (Id == null)
+        {
+            await courseServiceRegister.CreateCourseRegister(courseRegister);
+            navigationManager.NavigateTo("/academia/registers");
+        }
+        else
+        {
+            await courseServiceRegister.UpdateCourseRegister(courseRegister, (int)Id);
+            navigationManager.NavigateTo("/academia/registers");
+        }
+    }
+    async Task DeleteCourse()
+    {
+        await courseServiceRegister.DeleteCourseRegister(courseRegister.Id);
+        navigationManager.NavigateTo("/academia/registers");
+    }
+
+    private sealed class InputModel
+    {
+        public string? Status { get; set; }
+    }
+
+}

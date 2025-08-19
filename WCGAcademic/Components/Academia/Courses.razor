@@ -1,0 +1,55 @@
+﻿@page "/academia/courses"
+@using WCGAcademic.InMemoryData
+@rendermode InteractiveServer
+@inject ICourseService courseService
+@inject NavigationManager navigationManager
+
+<h3>Course</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>CourseCode</th>
+            <th>Course</th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var course in courseService.Courses)
+        {
+            <tr>
+                <td>@course.CourseCode</td>
+                <td>@course.Name</td>
+                <td> 
+                    <button class="btn btn-primary" @onclick="(()=>ShowCourse(course.Id))"> Edit
+                        @* <i class="oi oi-pencil"></i> *@
+                    </button>
+                </td>
+                <td></td>
+            </tr>
+        
+        }
+    </tbody>
+</table>
+<button class="btn btn-primary" @onclick="CreateNewCourse">Create</button>
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await courseService.GetCourses();      
+
+    }
+
+    void ShowCourse(int id)
+    {
+        navigationManager.NavigateTo($"/academia/editcourse/{id}");
+    }
+    void CreateNewCourse ()
+    {
+        navigationManager.NavigateTo($"/academia/editcourse");
+    }
+
+}

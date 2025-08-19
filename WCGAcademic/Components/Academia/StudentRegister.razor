@@ -1,0 +1,93 @@
+﻿@page "/academia/studentregister"
+@page "/academia/studentregister/{id:int}"
+@using WCGAcademic.InMemoryData
+@inject NavigationManager navigationManager
+@inject ICourseRegisterService courseRegisterService
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@inject ICourseService courseService
+@* @attribute [Authorize (Roles ="Student")] *@
+
+<h3>Student Register</h3>
+
+
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>PersonId</th>
+            <th>StudentName</th>
+            <th>CourseCode</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in courseRegisterService.CourseRegisters)
+        {
+            <tr>
+                <td>@student.Id</td>
+                <td>@student.PersonId</td>
+                <td>@student.StudentName</td>
+                <td>@student.CourseCode</td>
+                <td>@student.Status</td>
+                <td></td>
+                <td>
+                    <button class="btn btn-primary" @onclick="(() => ShowStudent(student.Id))">
+                        Edit
+                        @* <i class="oi oi-pencil"></i> *@
+                    </button>
+                </td>
+                <td></td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+<button type="button" @onclick="(() => CreateNewStudent())" class="btn btn-primary">Create New Record</button>
+     <br/>
+
+   @*  <button type="button" class="btn btn-primary" @onclick="(() => ShowCourses())">Available courses to Enrol</button> *@
+
+@* <CascadingValue Value="@StudentId">
+    <EditStudentRegister>
+
+    </EditStudentRegister>
+
+</CascadingValue> *@
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    List<CourseRegister> registers = new List<CourseRegister>();
+    List<Course> courses = new List<Course>();
+
+    public int StudentId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await courseRegisterService.GetStudentRegisterByCode(Id);
+        registers = result.ToList();
+        StudentId = Id;
+        // await courseService.GetCourses();
+    }
+
+    void ShowStudent(int id)
+    {
+        navigationManager.NavigateTo($"/academia/editstudentregister/{id}");
+    }
+    void CreateNewStudent()
+    {
+
+        navigationManager.NavigateTo($"/academia/editstudentregister");
+    }
+    void ShowCourses()
+    {
+        courseService.GetCourses();
+        navigationManager.NavigateTo("/academia/courses");
+    }
+
+}

@@ -1,0 +1,77 @@
+﻿@page "/academia/lectureregister"
+@page "/academia/lectureregister/{id:int}"
+@using WCGAcademic.InMemoryData
+@inject NavigationManager navigationManager
+@inject ICourseRegisterService courseRegisterService
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@inject ICourseService courseService
+@* @attribute [Authorize (Roles ="Lecturer")] *@
+
+<h3>Student Register</h3>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+          @*   <th>PersonId</th> *@
+            <th>StudentName</th>
+            <th>CourseCode</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in courseRegisterService.CourseRegisters)
+        {
+            <tr>
+                <td>@student.Id</td>
+               @*  <td>@student.PersonId</td> *@
+                <td>@student.StudentName</td>
+                <td>@student.CourseCode</td>
+                <td>@student.Status</td>
+                <td></td>
+                <td>
+                    <button class="btn btn-primary" @onclick="(() => ShowStudent(student.Id))">
+                        Edit
+                        @* <i class="oi oi-pencil"></i> *@
+                    </button>
+                </td>
+                <td></td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+<button type="button" class="btn btn-primary">Create New Record</button>
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    List<CourseRegister> registers = new List<CourseRegister>();
+    List<Course> courses = new List<Course>();
+    
+
+    protected override async Task OnInitializedAsync()
+    {
+       Course cc = await courseService.GetSingleCourse(Id);
+       // var result = await courseRegisterService.GetCourseRegisterByCode(Id);
+       // registers = result.ToList();
+        // await courseService.GetCourses();
+
+
+    }
+
+    void ShowStudent(int id)
+    {
+        navigationManager.NavigateTo($"/academia/lectureregistert/{id}");
+    }
+    void CreateNewStudent()
+    {
+        navigationManager.NavigateTo($"/academia/lectureregisterstudent");
+        // navigationManager.NavigateTo($"/academia/student");
+    }
+
+}

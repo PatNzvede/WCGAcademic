@@ -1,0 +1,55 @@
+﻿@page "/academia/lecturers"
+@rendermode InteractiveServer
+@using WCGAcademic.InMemoryData
+@inject NavigationManager navigationManager
+@inject ILecturerService lecturerService
+
+<h3>Lecturer</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>CourseCode</th>
+            <th>Email</th>
+
+            <th></th>using 
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var lecturer in lecturerService.Lecturers)
+        {
+            <tr>
+                <td>@lecturer.CourseCode</td>
+                <td>@lecturer.PersonId</td>
+                <td>
+                    <button class="btn btn-primary" @onclick="(() => ShowLecturer(lecturer.Id))">
+                        Edit
+                        @* <i class="oi oi-pencil"></i> *@
+                    </button>
+                </td>
+                <td></td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+<button class="btn btn-primary" @onclick="CreateNewLecturer">Create</button>
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await lecturerService.GetLecturers();
+
+    }
+
+    void ShowLecturer(int id)
+    {
+        navigationManager.NavigateTo($"/academia/editlecturer/{id}");
+    }
+    void CreateNewLecturer()
+    {
+        navigationManager.NavigateTo($"/academia/editlecturer");
+    }
+
+}
