@@ -39,12 +39,12 @@
                     </button>
                 </td>
 
-                <td>
+              @*   <td>
                     <button type="submit" class="btn btn-warning" @onclick="(() => StudentRecords(register.PersonId))">StudentRecords</button>
                 </td>
                 <td>
                     <button type="submit" class="btn btn-warning" @onclick="(() => CheckRecords(register.CourseCode))">CheckRecords</button>
-                </td>
+                </td> *@
                 <td></td>
             </tr>
 
@@ -81,7 +81,7 @@
     }
     void CreateNewCourseRegister()
     {
-        navigationManager.NavigateTo($"/academia/editregister");
+        navigationManager.NavigateTo($"/academia/addregister");
     }
     async Task CheckRecords(string code)
     {

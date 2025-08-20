@@ -1,0 +1,126 @@
+﻿@page "/academia/addregister"
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Authentication
+@using WCGAcademic.Data
+@using WCGAcademic.InMemoryData
+@inject UserManager<ApplicationUser> UserManager
+@inject NavigationManager navigationManager
+@inject ICourseRegisterService courseServiceRegister
+@inject IPersonService personService
+@inject ICourseService courseService
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+
+<EditForm Model="courseRegister" OnSubmit="HandleSubmit" FormName="create">
+    <div>
+        <label for="studentname">StudentName</label>
+        <InputText id="studentname" @bind-Value="courseRegister.StudentName" class="form-control"></InputText>
+    </div>
+    @* <div>
+        <label for="coursecode">CourseCode</label>
+        <InputText id="coursecode" @bind-Value="courseRegister.CourseCode" class="form-control"></InputText>
+    </div> *@
+
+    <div>
+        <select class="form-control" @bind="courseRegister.CourseCode">
+            <option value="">-- Select Course --</option>
+            <option value="Accounting">Accounting</option>
+            <option value="Algebra">Algebra</option>
+            <option value="Balancing">Balancing</option>
+            <option value="Networking">Networking</option>
+            <option value="Computing">Computing</option>
+        </select>
+
+    </div>
+
+
+    <div>
+        <select class="form-control" @bind="courseRegister.Status">
+            <option value="">-- Select Status --</option>
+            <option value="Request Approval">Request Approval</option>
+            <option value="Enrolled">Enrolled</option>
+            <option value="De-registered">De-registered</option>
+        </select>
+
+    </div>
+    @* <div>
+        <label for="personcode">PersonCode</label>
+        <InputText id="personcode" @bind-Value="courseRegister.PersonCode" class="form-control"></InputText>
+    </div> *@
+    @* <div>
+        <label for="personid">PersonId</label>
+        <InputNumber id="personid" @bind-Value="courseRegister.PersonId" class="form-control"></InputNumber>
+    </div> *@
+    <br />
+    <button type="submit" class="btn btn-primary">Create</button>
+
+   </EditForm>
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    [CascadingParameter]
+    public int StudentId { get; set; }
+
+    CourseRegister courseRegister = new CourseRegister();
+    public string btnText = string.Empty;
+
+    List<Course> courses = new List<Course>();
+    Person person = new Person();
+    private ClaimsPrincipal? currentUser;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        currentUser = authenticationState.User;
+
+        string? username = currentUser?.Identity?.Name;
+        bool isAuthenticated = currentUser?.Identity?.IsAuthenticated ?? false;
+        var claims = currentUser?.Claims;
+        var userid = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        memuser = await personService.GetGuidPerson(userid);
+
+      //  btnText = Id == null ? "Save new course register" : "Update Course Register";
+    }
+
+    protected Person memuser;
+
+    async Task HandleSubmit()
+    {
+        //i need user manager here
+
+        //var loggeduser = await UserManager.FindByEmailAsync("");
+
+
+        @if (memuser != null)
+        {
+            courseRegister.PersonId = memuser.Id;
+            courseRegister.UserId = memuser.IdentityId;
+            await courseServiceRegister.CreateCourseRegister(courseRegister);
+            navigationManager.NavigateTo("/academia/newregisters");
+        }
+        else
+        {
+            courseRegister.PersonId = memuser.Id;
+            await courseServiceRegister.UpdateCourseRegister(courseRegister, (int)Id);
+            navigationManager.NavigateTo($"/academia/newregisters");
+        }
+    }
+    async Task DeleteCourse()
+    {
+        await courseServiceRegister.DeleteCourseRegister(courseRegister.Id);
+        navigationManager.NavigateTo("/academia/registers");
+    }
+
+    private sealed class InputModel
+    {
+        public string? Status { get; set; }
+    }
+
+}
