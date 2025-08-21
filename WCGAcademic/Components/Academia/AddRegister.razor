@@ -15,10 +15,10 @@
 
 
 <EditForm Model="courseRegister" OnSubmit="HandleSubmit" FormName="create">
-    <div>
+   @*  <div>
         <label for="studentname">StudentName</label>
         <InputText id="studentname" @bind-Value="courseRegister.StudentName" class="form-control"></InputText>
-    </div>
+    </div> *@
     @* <div>
         <label for="coursecode">CourseCode</label>
         <InputText id="coursecode" @bind-Value="courseRegister.CourseCode" class="form-control"></InputText>
@@ -41,7 +41,7 @@
         <select class="form-control" @bind="courseRegister.Status">
             <option value="">-- Select Status --</option>
             <option value="Request Approval">Request Approval</option>
-            <option value="Enrolled">Enrolled</option>
+            @* <option value="Enrolled">Enrolled</option> *@
             <option value="De-registered">De-registered</option>
         </select>
 
@@ -101,15 +101,16 @@
         @if (memuser != null)
         {
             courseRegister.PersonId = memuser.Id;
+            courseRegister.StudentName = memuser.Email;
             courseRegister.UserId = memuser.IdentityId;
             await courseServiceRegister.CreateCourseRegister(courseRegister);
-            navigationManager.NavigateTo("/academia/newregisters");
+            navigationManager.NavigateTo("/academia/registers");
         }
         else
         {
             courseRegister.PersonId = memuser.Id;
             await courseServiceRegister.UpdateCourseRegister(courseRegister, (int)Id);
-            navigationManager.NavigateTo($"/academia/newregisters");
+            navigationManager.NavigateTo($"/academia/registers");
         }
     }
     async Task DeleteCourse()
@@ -124,3 +125,6 @@
     }
 
 }
+
+
+

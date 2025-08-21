@@ -30,15 +30,15 @@ else
         <select class="form-control" @bind="courseRegister.Status">
             <option value="">-- Select Status --</option>
             <option value="Request Approval">Request Approval</option>
-             <option value="Enrolled/Approved">Enrolled/Approved</option>
+            <option value="Enrolled/Approved">Enrolled/Approved</option>
             <option value="Declined">Decline</option>
         </select>
 
     </div>
-    <div>
+    @*  <div>
         <label for="personid">PersonId</label>
         <InputText id="personid" @bind-Value="courseRegister.PersonCode" class="form-control"></InputText>
-    </div>
+    </div> *@
     <br />
     <button type="submit" class="btn btn-primary">@btnText</button>
 

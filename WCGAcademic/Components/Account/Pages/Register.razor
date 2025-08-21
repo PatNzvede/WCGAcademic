@@ -45,11 +45,11 @@
                 <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger" />
             </div>
 
-            <div class="form-floating mb-3">
+           @*  <div class="form-floating mb-3">
                 <InputText type="text" @bind-Value="Input.Name" class="form-control" autocomplete="name" aria-required="true" placeholder="full name" />
                 <label for="password">Name</label>
                 <ValidationMessage For="() => Input.Name" class="text-danger" />
-            </div>
+            </div> *@
 
             <div class="form-floating mb-3">
 
@@ -64,11 +64,11 @@
                 @* <ValidationMessage For="() => Input.Role" class="text-danger" /> *@
             </div>
 
-            <div class="form-floating mb-3">
+          @*   <div class="form-floating mb-3">
                 <InputDate id="dateofbirth" @bind-Value="Input.DateofBirth" class="form-control" autocomplete="dateofbirth" aria-required="true" placeholder="date of birth" />
                 <label for="dateofbirth">Date of Birth</label>
                 <ValidationMessage For="() => Input.DateofBirth" class="text-danger" />
-            </div>
+            </div> *@
             <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
         </EditForm>
     </div>
@@ -98,8 +98,8 @@
     {
         var user = CreateUser();
         user.Role = Input.Role;
-        user.DateofBirth = Input.DateofBirth;
-        user.Name = Input.Name;
+       // user.DateofBirth = Input.DateofBirth;
+        //user.Name = Input.Name;
 
         var test = await UserManager.FindByEmailAsync(Input.Email);
 
@@ -186,15 +186,15 @@
     {
         public string? Role { get; set; }
 
-        [Required]
+        // [Required]
 
-        [Display(Name = "Name")]
-        public string Name { get; set; } = "";
+        // [Display(Name = "Name")]
+        // public string Name { get; set; } = "";
 
-        [Required]
+        // [Required]
 
-        [Display(Name = "Date of Birth")]
-        public DateOnly DateofBirth { get; set; } = new DateOnly();
+        // [Display(Name = "Date of Birth")]
+        // public DateOnly DateofBirth { get; set; } = new DateOnly();
 
         [Required]
         [EmailAddress]

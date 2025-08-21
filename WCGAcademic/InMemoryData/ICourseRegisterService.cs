@@ -17,6 +17,9 @@
         Task<List<CourseRegister>> GetRegisterByCodeByUserId(int id);
 
 
+        Task<List<CourseRegister>> GetAllRegisterByCodeByUserId();
+        Task<List<CourseRegister>> GetRegisterByCodeByUser(string id);
+
 
 
 

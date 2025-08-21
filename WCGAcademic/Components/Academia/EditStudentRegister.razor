@@ -51,7 +51,7 @@ else
         <select class="form-control" @bind="courseRegister.Status">
             <option value="">-- Select Status --</option>
             <option value="Request Approval">Request Approval</option>
-            <option value="Enrolled">Enrolled</option>
+         @*    <option value="Enrolled">Enrolled</option> *@
             <option value="De-registered">De-registered</option>
         </select>
 
@@ -88,32 +88,39 @@ else
 
     List<Course> courses = new List<Course>();
     Person person = new Person();
+    List<CourseRegister> courselist = new List<CourseRegister>();
     private ClaimsPrincipal? currentUser;
+
     protected override async Task OnParametersSetAsync()
     {
-        //var user = @context.User.Identity?.Name!;
-        // int test = StudentId;
-        //@if (Id == 0 )  //null)
-        //{
-           //courseRegister = await courseServiceRegister.GetSingleCourseRegister((int)Id);
-            // @if(courseRegister == null)
-            // {
-             //   navigationManager.NavigateTo("/academia/editstudentregister");
-            // }
-       // }
+        @if (Id != null)
+        {
+            courseRegister = await courseServiceRegister.GetSingleCourseRegister((int)Id);
+        }
     }
-
+    
     protected override async Task OnInitializedAsync()
     {
-        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        // var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 
-        currentUser = authenticationState.User;
+        // currentUser = authenticationState.User;
 
-        string? username = currentUser?.Identity?.Name;
-        bool isAuthenticated = currentUser?.Identity?.IsAuthenticated ?? false;
-        var claims = currentUser?.Claims;
-        var userid = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        memuser = await personService.GetGuidPerson(userid);
+        // string? username = currentUser?.Identity?.Name;
+        // bool isAuthenticated = currentUser?.Identity?.IsAuthenticated ?? false;
+        // var claims = currentUser?.Claims;
+        // var userid = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        // memuser = await personService.GetGuidPerson(userid);
+
+        // @if (memuser.Role == "Student")
+        // {
+        //     courselist = await courseServiceRegister.GetRegisterByCodeById(Id);
+        //     navigationManager.NavigateTo("/academia/registers");
+        // }
+        // else
+        // {
+        //     //courselist = await courseServiceRegister.GetCourseRegister();
+
+        // }
 
         btnText = Id == null ? "Save new course register" : "Update Course Register";
     }
@@ -121,27 +128,18 @@ else
     protected Person memuser;
 
     async Task HandleSubmit()
-    {
-        //i need user manager here
-
-        //var loggeduser = await UserManager.FindByEmailAsync("");
-
-
-        @if (Id == null  && memuser != null)
-        {
-            // var user = courseServiceRegister.GetStudentRegisterByCode(courseRegister.PersonId, courseRegister.CourseCode, courseRegister.Status);
-            // if (user.Exception != null)
-
-            //     throw new NotSupportedException("You can only have one request per course.");
-            courseRegister.PersonId = memuser.Id;
+    {       
+        @if (Id == null ) //  && memuser != null)
+        {          
+           // courseRegister.PersonId = memuser.Id;
             await courseServiceRegister.CreateCourseRegister(courseRegister);
-            navigationManager.NavigateTo("/academia/newregisters");
+            navigationManager.NavigateTo("/academia/registers");
         }
         else
         {
-            courseRegister.PersonId = memuser.Id;
+           // courseRegister.PersonId = memuser.Id;
             await courseServiceRegister.UpdateCourseRegister(courseRegister, (int)Id);
-            navigationManager.NavigateTo($"/academia/newregisters");
+            navigationManager.NavigateTo($"/academia/registers");
         }
     }
     async Task DeleteCourse()
@@ -156,3 +154,4 @@ else
     }
 
 }
+

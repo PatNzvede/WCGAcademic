@@ -122,6 +122,25 @@ namespace WCGAcademic.InMemoryData
             return courseRegister!;
         }
 
+        public async Task<List<CourseRegister>> GetRegisterByCodeByUser(string id)
+        {
+            var regs = from p in _context.CourseRegisters
+                       where p.UserId == id
+                       select p;
+            //if (regs.Count() != 0)
+            // throw new Exception("No registers here ..../");
+            return regs.ToList();
+        }
+        public async Task<List<CourseRegister>> GetAllRegisterByCodeByUserId()
+        {
+            var regs = from p in _context.CourseRegisters
+                           // where p.PersonId == id
+                       select p;
+            //if (regs.Count() != 0)
+            // throw new Exception("No registers here ..../");
+            return regs.ToList();
+        }
+
         public async Task UpdateCourseRegister(CourseRegister courseRegister, int id)
         {
             var dbCourseRegister = await _context.CourseRegisters.FindAsync(id);

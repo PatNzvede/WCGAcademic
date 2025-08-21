@@ -1,8 +1,12 @@
 ﻿@page "/academia/registers"
+@using System.Security.Claims
 @using WCGAcademic.InMemoryData
 @rendermode InteractiveServer
 @inject ICourseRegisterService courseServiceRegister
+@inject IPersonService personService
 @inject NavigationManager navigationManager
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <h3>Course Register</h3>
 
@@ -10,9 +14,10 @@
 <table class="table">
     <thead>
         <tr>
+            <th>Id</th>
             <th>StudentName</th>
             <th>PersonId</th>
-          @*   <th>PersonCode</th> *@
+            @*   <th>PersonCode</th> *@
             <th>CourseCode</th>
             <th>Status</th>
 
@@ -20,12 +25,13 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var register in courseServiceRegister.CourseRegisters)
+        @foreach (var register in courseRegisters)
         {
             <tr>
+                <td>@register.Id</td>
                 <td>@register.StudentName</td>
                 <td>@register.PersonId</td>
-               @*  <td>@register.PersonCode</td> *@
+                @*  <td>@register.PersonCode</td> *@
                 <td>@register.CourseCode</td>
                 <td>@register.Status</td>
                 <td>
@@ -35,32 +41,57 @@
                     </button>
                 </td>
 
-               @*  <td>
-                    <button type="submit" class="btn btn-warning" @onclick="(() => StudentRecords(register.PersonId))">StudentRecords</button>
-                </td>
-                 <td>
-                    <button type="submit" class="btn btn-warning" @onclick="(() => CheckRecords(register.CourseCode))">CheckRecords</button>
-                </td> *@
-                <td></td>
+              <td></td>
             </tr>
 
         }
     </tbody>
 </table>
-<button class="btn btn-primary" @onclick="CreateNewCourseRegister">Create</button>
+@* <button class="btn btn-primary" @onclick="CreateNewCourseRegister">Create</button> *@
 
 
 @code {
+    private ClaimsPrincipal? currentUser;
+    protected Person memuser;
+    List<CourseRegister> courseRegisters = new List<CourseRegister>();
 
     protected override async Task OnInitializedAsync()
     {
-        await courseServiceRegister.GetCourseRegister();
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        currentUser = authenticationState.User;
+
+        string? username = currentUser?.Identity?.Name;
+        bool isAuthenticated = currentUser?.Identity?.IsAuthenticated ?? false;
+        var claims = currentUser?.Claims;
+        var userid = claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        memuser = await personService.GetGuidPerson(userid);
+        if (memuser != null)
+        {
+            if (memuser.Role == "Student")
+            {
+                courseRegisters = await courseServiceRegister.GetRegisterByCodeByUserId(memuser.Id);
+            }
+            else
+            {
+                courseRegisters = await courseServiceRegister.GetAllRegisterByCodeByUserId();
+            }
+        }
+        else
+        {
+            courseRegisters = await courseServiceRegister.GetAllRegisterByCodeByUserId();
+        }
 
     }
 
     void ShowCourseRegister(int id)
     {
-        navigationManager.NavigateTo($"/academia/editstudentregister/{id}");
+        if (memuser.Role == "Student")
+        {
+            navigationManager.NavigateTo($"/academia/editstudentregister/{id}");
+        }
+        else
+            navigationManager.NavigateTo($"/academia/editlecturerregister/{id}");
     }
     void CreateNewCourseRegister()
     {
@@ -71,7 +102,7 @@
         await courseServiceRegister.GetCourseRegisterByCode(code);
     }
 
-    
+
     async Task StudentRecords(int code)
     {
         await courseServiceRegister.GetStudentRegisterByCode(code);

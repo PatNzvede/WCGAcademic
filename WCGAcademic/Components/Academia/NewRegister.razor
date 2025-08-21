@@ -14,19 +14,21 @@
 <table class="table">
     <thead>
         <tr>
-            <th>StudentName</th>
-            <th>PersonId</th>
-            @*   <th>PersonCode</th> *@
-            <th>CourseCode</th>
-            <th>Status</th>
+        <tr>Id</tr>
+    <th>StudentName</th>
+    <th>PersonId</th>
+    @*   <th>PersonCode</th> *@
+    <th>CourseCode</th>
+    <th>Status</th>
 
-            <th></th>
-        </tr>
+    <th></th>
+    </tr>
     </thead>
     <tbody>
         @foreach (var register in courseServiceRegister.CourseRegisters)
         {
             <tr>
+                <th>@register.Id</th>
                 <td>@register.StudentName</td>
                 <td>@register.PersonId</td>
                 @*  <td>@register.PersonCode</td> *@
@@ -39,7 +41,7 @@
                     </button>
                 </td>
 
-              @*   <td>
+                @*   <td>
                     <button type="submit" class="btn btn-warning" @onclick="(() => StudentRecords(register.PersonId))">StudentRecords</button>
                 </td>
                 <td>
@@ -58,7 +60,7 @@
 
     private ClaimsPrincipal? currentUser;
     protected Person memuser;
-   
+
     protected override async Task OnInitializedAsync()
     {
         var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -75,8 +77,10 @@
 
     }
 
-    void ShowCourseRegister(int id)
+    async Task ShowCourseRegister(int id)
     {
+        await courseServiceRegister.GetRegisterByCodeByUser(memuser.IdentityId);
+
         navigationManager.NavigateTo($"/academia/editregister/{id}");
     }
     void CreateNewCourseRegister()

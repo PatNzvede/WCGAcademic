@@ -12,6 +12,8 @@
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject IPersonService personService
+@inject ICourseRegisterService courseRegisterService
 
 <PageTitle>Log in</PageTitle>
 
@@ -80,7 +82,8 @@
 
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
-    public int StudentId { get; set; } 
+    public int StudentId { get; set; }
+    List<CourseRegister> courseRegisters = new List<CourseRegister>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -106,16 +109,25 @@
             {
                 // string Id = user.Id;
                 var person = await personService.GetGuidPerson(user.Id);
+                if (person == null)
+                {
+                    //errorMessage = "Error: Invalid login attempt., Register first before using the app";
+                    Logger.LogWarning("Error: Invalid login attempt., Register first before using the app.");
+                    RedirectManager.RedirectTo("Account/Register");
+
+                }
                 int Id = person.Id;
                 StudentId = Id;
-                if (user.Role == "Lecturer" || user.Role =="Admin")
+                if (user.Role == "Lecturer" || user.Role == "Admin")
                 {
-                    NavigationManager.NavigateTo("/");
+                    courseRegisters = await courseRegisterService.GetAllRegisterByCodeByUserId();
+                    NavigationManager.NavigateTo("/academia/registers");
                 }
                 else if (user.Role == "Student")
                 {
-                    NavigationManager.NavigateTo($"/academia/studentregister/{Id}");
-                   // / academia / studentregister
+                    courseRegisters = await courseRegisterService.GetRegisterByCodeByUser(user.Id);
+                    NavigationManager.NavigateTo("academia/registers");
+                    // / academia / studentregister
                 }
                 else
 
@@ -137,7 +149,7 @@
         }
         else
         {
-            errorMessage = "Error: Invalid login attempt.";
+            errorMessage = "Error: Invalid login attempt, use valid credntials or register first";
         }
     }
 

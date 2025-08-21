@@ -1,32 +1,38 @@
-﻿@page "/academia/editperson"
-@page "/academia/editperson/{id:int}"
+﻿@page "/academia/editstudent"
+@page "/academia/editstudent/{id:int}"
 @using WCGAcademic.InMemoryData
 @rendermode InteractiveServer
-@inject IPersonService personService;
+@inject IStudentService studentService;
+@inject NavigationManager navigationManager
 
 @if (Id == null)
 {
-    <h3>Create a new Person</h3>
+    <h3>Create a new Student</h3>
 }
 else
 {
-    <h3> Edit @person.Email</h3>
+    <h3> Edit @student.PersonId</h3>
 }
 
-<EditForm Model="person" OnSubmit="HandleSubmit" FormName="create">
+
+<EditForm Model="student" OnSubmit="HandleSubmit" FormName="create">
     <div>
-        <label for="email">Email</label>
-        <InputText id="email" @bind-Value="person.Email" class="form-control"></InputText>
+        <label for="coursecode">CourseCode</label>
+        <InputText id="coursecode" @bind-Value="student.CourseCode" class="form-control"></InputText>
     </div>
     <div>
-        <label for="role">Role</label>
-        <InputText id="role" @bind-Value="person.Role" class="form-control"></InputText>
+        <label for="personid">PersonId</label>
+        <InputNumber id="personid" @bind-Value="student.PersonId" class="form-control"></InputNumber>
+    </div>
+    <div>
+        <label for="status">Status</label>
+        <InputText id="status" @bind-Value="student.Status" class="form-control"></InputText>
     </div>
     <br />
     <button type="submit" class="btn btn-primary">@btnText</button>
-    @if(Id != null)
+    @if (Id != null)
     {
-    <button type="button" class="btn btn-danger" @onclick="DeletePerson"> Delete Person</button>
+        <button type="button" class="btn btn-danger" @onclick="DeleteStudent"> Delete Student</button>
     }
 
 
@@ -38,20 +44,25 @@ else
     [Parameter]
     public int? Id { get; set; }
 
-    Person person = new Person();
+
+    Student student = new Student();
     public string btnText = string.Empty;
 
+    public int StudentId = 1;
     protected override async Task OnParametersSetAsync()
     {
         if (Id != null)
         {
-            person = await personService.GetSinglePerson((int)Id);
+            student = await studentService.GetSingleStudent((int)Id);
+
         }
     }
 
+
     protected override void OnInitialized()
     {
-        btnText = Id == null ? "Save new person" : "Update person";
+
+        btnText = Id == null ? "Save new student" : "Update student";
     }
 
 
@@ -59,16 +70,18 @@ else
     {
         if (Id == null)
         {
-            await personService.CreatePerson(person);
+            await studentService.CreateStudent(student);
+            navigationManager.NavigateTo("/academia/students");
         }
         else
         {
-            await personService.UpdatePerson(person, (int)Id);
+            await studentService.UpdateStudent(student, (int)Id);
+            navigationManager.NavigateTo($"/academia/students/{Id}");
         }
     }
-    async Task DeletePerson()
+    async Task DeleteStudent()
     {
-        await personService.DeletePerson(person.Id);
+        await studentService.DeleteStudent(student.Id);
+        navigationManager.NavigateTo("/academia/students");
     }
-
 }

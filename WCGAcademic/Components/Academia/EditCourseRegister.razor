@@ -25,17 +25,17 @@ else
     <div>
         <label for="coursecode">CourseCode</label>
         <InputText id="coursecode" @bind-Value="courseRegister.CourseCode" class="form-control"></InputText>
-    </div>  
+    </div>
 
- 
+
     <div>
-    <select class="form-control" @bind="courseRegister.Status">
-        <option value="">-- Select Status --</option>
-        <option value="Request Approval">Request Approval</option>
-        <option value="Enrolled">Enrolled</option>
-        <option value="De-registered">De-registered</option>
-    </select>
-      
+        <select class="form-control" @bind="courseRegister.Status">
+            <option value="">-- Select Status --</option>
+            <option value="Request Approval">Request Approval</option>
+            <option value="Enrolled">Enrolled</option>
+            <option value="De-registered">De-registered</option>
+        </select>
+
     </div>
     @* <div>
         <label for="personcode">PersonCode</label>
@@ -47,10 +47,10 @@ else
     </div>
     <br />
     <button type="submit" class="btn btn-primary">@btnText</button>
-    
-    @if(Id != null)
+
+    @if (Id != null)
     {
-    <button type="button" class="btn btn-danger" @onclick="DeleteCourse"> Delete Course</button>
+        <button type="button" class="btn btn-danger" @onclick="DeleteCourse"> Delete Course</button>
     }
 
 
@@ -77,19 +77,19 @@ else
     protected override async Task OnInitializedAsync()
     {
         //courses = courseService.GetCourses()
-       // person = personService.GetSinglePerson(Id);
+        // person = personService.GetSinglePerson(Id);
         btnText = Id == null ? "Save new course register" : "Update Course Register";
     }
 
 
-   
+
     async Task HandleSubmit()
     {
         @if (Id == null)
         {
             var user = courseServiceRegister.GetStudentRegisterByCode(courseRegister.PersonId, courseRegister.CourseCode, courseRegister.Status);
-            if(user.Exception != null)
-            
+            if (user.Exception != null)
+
                 throw new NotSupportedException("You can only have one request per course.");
             await courseServiceRegister.CreateCourseRegister(courseRegister);
             navigationManager.NavigateTo("/academia/registers");
