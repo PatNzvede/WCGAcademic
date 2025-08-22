@@ -1,6 +1,7 @@
 ﻿@page "/academia/addregister"
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Authentication
+@using System.ComponentModel.DataAnnotations
 @using WCGAcademic.Data
 @using WCGAcademic.InMemoryData
 @inject UserManager<ApplicationUser> UserManager
@@ -14,7 +15,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 
-<EditForm Model="courseRegister" OnSubmit="HandleSubmit" FormName="create">
+<EditForm Model="courseRegister" OnValidSubmit="HandleSubmit" FormName="create">
    @*  <div>
         <label for="studentname">StudentName</label>
         <InputText id="studentname" @bind-Value="courseRegister.StudentName" class="form-control"></InputText>
@@ -23,6 +24,10 @@
         <label for="coursecode">CourseCode</label>
         <InputText id="coursecode" @bind-Value="courseRegister.CourseCode" class="form-control"></InputText>
     </div> *@
+
+    <h3> We are registering here.</h3>
+    <br/>
+    <p>  You can choose any of the courses in the drop down list and request approval before you can enrol </p>
 
     <div>
         <select class="form-control" @bind="courseRegister.CourseCode">
@@ -35,6 +40,20 @@
         </select>
 
     </div>
+
+    @* <div>
+
+        <label for="optionSelect">Select an option:</label>
+        <InputSelect id="optionSelect" @bind-Value="myModel.SelectedOption">
+            <option value="">-- Select --</option>
+            @foreach (var option in Options)
+            {
+                <option value="@option">@option</option>
+            }
+        </InputSelect>
+        <ValidationMessage For="@(() => myModel.SelectedOption)" />
+
+    </div> *@
 
 
     <div>
@@ -64,11 +83,22 @@
     [Parameter]
     public int Id { get; set; }
 
-    [CascadingParameter]
-    public int StudentId { get; set; }
+    // [CascadingParameter]
+    // public int StudentId { get; set; }
+
+    private MyModel myModel = new MyModel();
+
+    public class MyModel
+    {
+        [Required(ErrorMessage = "Please select an option.")]
+        public string SelectedOption { get; set; }
+    }
 
     CourseRegister courseRegister = new CourseRegister();
     public string btnText = string.Empty;
+
+    private List<string> Options = new List<string> { "Option A", "Option B", "Option C" };
+
 
     List<Course> courses = new List<Course>();
     Person person = new Person();
@@ -121,7 +151,10 @@
 
     private sealed class InputModel
     {
+        [Required]
         public string? Status { get; set; }
+        [Required]
+        public string? CourseCode { get; set; }
     }
 
 }

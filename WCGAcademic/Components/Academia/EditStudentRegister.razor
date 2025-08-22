@@ -24,7 +24,8 @@ else
     <h3> Edit @courseRegister.StudentName</h3>
 }
 
-<EditForm Model="courseRegister" OnSubmit="HandleSubmit" FormName="create">
+<EditForm Model="courseRegister" OnValidSubmit="HandleSubmit" FormName="create">
+    <DataAnnotationsValidator />
     <div>
         <label for="studentname">StudentName</label>
         <InputText id="studentname" @bind-Value="courseRegister.StudentName" class="form-control"></InputText>
